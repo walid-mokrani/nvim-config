@@ -1,6 +1,9 @@
 return {
   -- GitHub Copilot
-  'github/copilot.vim',
+  {
+    'github/copilot.vim',
+    event = 'InsertEnter',
+  },
 
   -- Claude Code
   {
