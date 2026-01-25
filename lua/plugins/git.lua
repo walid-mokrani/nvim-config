@@ -55,6 +55,10 @@ return {
       -- Toggle
       map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line' })
       map('n', '<leader>tD', gitsigns.toggle_deleted, { desc = '[T]oggle git show [D]eleted' })
+      map('n', '<leader>tg', function()
+        gitsigns.toggle_linehl()
+        gitsigns.toggle_deleted()
+      end, { desc = '[T]oggle [g]it line highlights and deleted' })
     end,
   },
 }

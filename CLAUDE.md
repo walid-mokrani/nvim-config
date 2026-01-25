@@ -35,6 +35,9 @@ rust_analyzer (with clippy), bashls, cssls, html, jsonls, yamlls, ts_ls, lua_ls
 
 **Search (Telescope):** `<leader>s` prefix - `sf` files, `sg` grep, `sh` help, `sk` keymaps
 **LSP:** `gd` definition, `gr` references, `K` hover, `<leader>ca` code action, `<leader>rn` rename
+**Document/Debug:** `<leader>d` prefix - `ds` document symbols, `db` breakpoint, `dc` continue
+**Workspace:** `<leader>w` prefix - `ws` workspace symbols
+**Toggle:** `<leader>t` prefix - `tb` git blame, `tD` git deleted, `th` inlay hints
 **Git:** `<leader>h` prefix for hunk operations, `]c`/`[c` navigate changes
 **Flutter:** `<leader>F` prefix - `Fc` commands, `Ff` fvm
 **Claude Code:** `<leader>A` prefix - `Ac` new session, `Ar` resume, `At` toggle, `<C-\>` toggle window
