@@ -40,7 +40,7 @@ rust_analyzer (with clippy), bashls, cssls, html, jsonls, yamlls, ts_ls, lua_ls
 **Toggle:** `<leader>t` prefix - `tb` git blame, `tD` git deleted, `th` inlay hints
 **Git:** `<leader>h` prefix for hunk operations, `]c`/`[c` navigate changes
 **Flutter:** `<leader>F` prefix - `Fc` commands, `Ff` fvm
-**Claude Code:** `<leader>A` prefix - `Ac` new session, `Ar` resume, `At` toggle, `<C-\>` toggle window
+**Claude Code:** `<leader>A` prefix - `Ac` new session, `Ar` resume, `At` toggle, `Ao` continue, `Av` verbose, `<C-\>` toggle window
 **Format:** `<leader>f` format buffer
 
 ## Adding New Plugins
