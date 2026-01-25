@@ -1,8 +1,22 @@
 return {
-  -- GitHub Copilot
+  -- GitHub Copilot (Lua rewrite)
   {
-    'github/copilot.vim',
+    'zbirenbaum/copilot.lua',
+    cmd = 'Copilot',
     event = 'InsertEnter',
+    opts = {
+      suggestion = {
+        auto_trigger = true,
+        keymap = {
+          accept = '<M-l>',
+          accept_word = '<M-k>',
+          accept_line = '<M-j>',
+          next = '<M-]>',
+          prev = '<M-[>',
+          dismiss = '<C-]>',
+        },
+      },
+    },
   },
 
   -- Claude Code

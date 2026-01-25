@@ -41,6 +41,7 @@ return {
           map('K', vim.lsp.buf.hover, 'Hover Documentation')
           map('<leader>cd', vim.diagnostic.open_float, '[C]ode [D]iagnostics')
           map('<leader>cl', vim.lsp.codelens.run, '[C]ode [L]ens')
+          map('<leader>lr', '<cmd>LspRestart<CR>', '[L]SP [R]estart')
 
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
