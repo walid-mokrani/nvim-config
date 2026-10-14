@@ -23,13 +23,13 @@ This is a Neovim configuration based on Kickstart.nvim, modularized for maintain
 - **Nerd Font:** Disabled by default (`vim.g.have_nerd_font = false` in options.lua)
 - **Plugin manager:** lazy.nvim (auto-installed if missing)
 - **LSP:** nvim-lspconfig with Mason for automatic installation
-- **Formatting:** conform.nvim with format-on-save (disabled for C/C++)
+- **Formatting:** conform.nvim with format-on-save (LSP fallback disabled for C/C++). For js/ts/json/css, Biome runs first when a `biome.json` is present (`require_cwd`), else falls back to prettier.
 - **Completion:** nvim-cmp with LSP source
 - **Flutter:** flutter-tools.nvim with FVM support
 
 ## LSP Servers Configured
 
-rust_analyzer (with clippy), bashls, cssls, html, jsonls, yamlls, ts_ls, lua_ls
+rust_analyzer (with clippy), bashls, cssls, html, jsonls, yamlls, ts_ls, biome (lint + code actions, attaches only when biome.json present), lua_ls
 
 ## Key Bindings Reference
 

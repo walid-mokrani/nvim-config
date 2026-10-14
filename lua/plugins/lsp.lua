@@ -102,6 +102,9 @@ return {
         jsonls = {},
         yamlls = {},
         ts_ls = {},
+        -- Biome: lint diagnostics + code actions; only attaches when a
+        -- biome.json/biome.jsonc is present, reading the project's own rules.
+        biome = {},
         lua_ls = {
           settings = {
             Lua = {
