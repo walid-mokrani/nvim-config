@@ -1,6 +1,10 @@
 return {
   'nvim-treesitter/nvim-treesitter',
-  build = ':TSUpdate',
+  -- Not `:TSUpdate` — that command returns before the async update finishes,
+  -- so lazy marks the build done and the parsers stay on the old grammar.
+  build = function()
+    require('nvim-treesitter').update():wait(300000)
+  end,
   config = function()
     require('nvim-treesitter').install({
       'bash',
