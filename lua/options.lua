@@ -67,6 +67,14 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+-- Diagnostics: inline messages (off by default since Neovim 0.11),
+-- errors sorted first, rounded border on the <leader>cd float
+vim.diagnostic.config {
+  severity_sort = true,
+  virtual_text = { spacing = 2, source = 'if_many' },
+  float = { border = 'rounded', source = 'if_many' },
+}
+
 -- Disable unused remote-plugin providers (Python provider stays enabled via pynvim)
 vim.g.loaded_node_provider = 0
 vim.g.loaded_perl_provider = 0

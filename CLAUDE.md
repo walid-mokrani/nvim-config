@@ -29,7 +29,7 @@ This is a Neovim configuration based on Kickstart.nvim, modularized for maintain
 
 ## LSP Servers Configured
 
-rust_analyzer (with clippy), bashls, lua_ls
+rust_analyzer (with clippy, inlay hints on by default; installed via `rustup component add rust-analyzer`, not Mason), bashls, lua_ls
 
 ## Key Bindings Reference
 

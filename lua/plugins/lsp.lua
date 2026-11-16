@@ -68,8 +68,13 @@ return {
           end
 
           if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+            -- Inferred types and parameter names are most useful in Rust
+            if client.name == 'rust_analyzer' then
+              vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+            end
             map('<leader>th', function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
+              local filter = { bufnr = event.buf }
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(filter), filter)
             end, '[T]oggle Inlay [H]ints')
           end
         end,
@@ -108,7 +113,11 @@ return {
         },
       }
 
-      local ensure_installed = vim.tbl_keys(servers or {})
+      -- rust-analyzer comes from rustup (`rustup component add rust-analyzer`)
+      -- so it matches the active toolchain; don't install it through Mason.
+      local ensure_installed = vim.tbl_filter(function(name)
+        return name ~= 'rust_analyzer'
+      end, vim.tbl_keys(servers))
       vim.list_extend(ensure_installed, {
         'stylua',
         'sql-formatter',
@@ -127,6 +136,8 @@ return {
         -- stylua is used as a formatter (conform), not as an LSP
         automatic_enable = { exclude = { 'stylua' } },
       }
+      -- Not installed by Mason, so mason-lspconfig won't enable it
+      vim.lsp.enable 'rust_analyzer'
     end,
   },
 }
