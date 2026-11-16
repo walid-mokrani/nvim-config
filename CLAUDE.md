@@ -22,7 +22,7 @@ This is a Neovim configuration based on Kickstart.nvim, modularized for maintain
 - **Leader key:** Space
 - **Nerd Font:** Disabled by default (`vim.g.have_nerd_font = false` in options.lua)
 - **Plugin manager:** lazy.nvim (auto-installed if missing); `lazy-lock.json` is committed, so commit it after `:Lazy update`
-- **LSP:** nvim-lspconfig with Mason for automatic installation
+- **LSP:** native `vim.lsp` (Neovim 0.11+) with nvim-lspconfig's defaults. In `lua/plugins/lsp.lua`: shared capabilities via `vim.lsp.config('*')`, servers turned on by an explicit `vim.lsp.enable { ... }` list, and an explicit Mason install list (mason-tool-installer, Mason package names). Per-server settings go in `after/lsp/<name>.lua`, which overrides nvim-lspconfig (see `:h lsp-config-merge`). To add a server: add it to `vim.lsp.enable`, add its Mason package to `ensure_installed` (unless installed another way), and create `after/lsp/<name>.lua` only if it needs custom settings.
 - **Formatting:** conform.nvim with format-on-save (LSP formatting as fallback). Formatters: stylua (Lua), rustfmt (Rust), dart_format (Dart), sql-formatter (SQL).
 - **Completion:** nvim-cmp with LSP source
 - **Database:** vim-dadbod + dadbod-ui with dadbod completion for SQL

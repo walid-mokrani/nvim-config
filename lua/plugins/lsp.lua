@@ -15,7 +15,6 @@ return {
     'neovim/nvim-lspconfig',
     dependencies = {
       { 'mason-org/mason.nvim', opts = {} },
-      'mason-org/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
       'hrsh7th/cmp-nvim-lsp',
     },
@@ -80,64 +79,29 @@ return {
         end,
       })
 
+      -- Shared settings for every server. Per-server settings live in
+      -- after/lsp/<name>.lua and are merged over nvim-lspconfig's defaults
+      -- (see :h lsp-config-merge).
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
-
-      local servers = {
-        rust_analyzer = {
-          settings = {
-            ['rust-analyzer'] = {
-              cargo = {
-                allFeatures = true,
-                buildScripts = { enable = true },
-              },
-              checkOnSave = true,
-              check = {
-                command = 'clippy',
-              },
-              procMacro = {
-                enable = true,
-              },
-            },
-          },
-        },
-        bashls = {},
-        lua_ls = {
-          settings = {
-            Lua = {
-              completion = {
-                callSnippet = 'Replace',
-              },
-            },
-          },
-        },
-      }
-
-      -- rust-analyzer comes from rustup (`rustup component add rust-analyzer`)
-      -- so it matches the active toolchain; don't install it through Mason.
-      local ensure_installed = vim.tbl_filter(function(name)
-        return name ~= 'rust_analyzer'
-      end, vim.tbl_keys(servers))
-      vim.list_extend(ensure_installed, {
-        'stylua',
-        'sql-formatter',
-      })
-      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
-
-      -- Native (nvim 0.11+) LSP config: shared capabilities for every server,
-      -- then per-server overrides merged on top of nvim-lspconfig's defaults.
       vim.lsp.config('*', { capabilities = capabilities })
-      for server_name, server in pairs(servers) do
-        vim.lsp.config(server_name, server)
-      end
 
-      -- mason-lspconfig v2 calls vim.lsp.enable() for installed servers.
-      require('mason-lspconfig').setup {
-        -- stylua is used as a formatter (conform), not as an LSP
-        automatic_enable = { exclude = { 'stylua' } },
+      -- Language servers to run (nvim-lspconfig names)
+      vim.lsp.enable {
+        'rust_analyzer', -- from rustup, so it matches the active toolchain
+        'lua_ls',
+        'bashls',
       }
-      -- Not installed by Mason, so mason-lspconfig won't enable it
-      vim.lsp.enable 'rust_analyzer'
+
+      -- Tools Mason installs (Mason package names)
+      require('mason-tool-installer').setup {
+        ensure_installed = {
+          'lua-language-server',
+          'bash-language-server',
+          'stylua', -- formatter (conform)
+          'sql-formatter', -- formatter (conform)
+        },
+      }
     end,
   },
 }

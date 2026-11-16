@@ -20,5 +20,6 @@ nvim  # lazy.nvim bootstraps itself and installs plugins from lazy-lock.json
 | `lua/keymaps.lua` | Global keymaps |
 | `lua/autocmds.lua` | Autocommands |
 | `lua/plugins/*.lua` | One lazy.nvim spec per plugin group, auto-imported |
+| `after/lsp/<name>.lua` | Per-server LSP settings, merged over nvim-lspconfig defaults |
 
 Plugin versions are pinned in `lazy-lock.json`; run `:Lazy update` to bump them, then commit the lockfile.
