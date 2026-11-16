@@ -6,7 +6,7 @@ return {
     require('nvim-treesitter').update():wait(300000)
   end,
   config = function()
-    require('nvim-treesitter').install({
+    require('nvim-treesitter').install {
       'bash',
       'c',
       'dart',
@@ -24,10 +24,11 @@ return {
       'vim',
       'vimdoc',
       'yaml',
-    })
+    }
 
-    -- Enable treesitter-based highlighting and indentation (built-in)
+    -- Built-in treesitter highlighting, plus nvim-treesitter's indentation
     vim.api.nvim_create_autocmd('FileType', {
+      group = vim.api.nvim_create_augroup('user-treesitter', { clear = true }),
       callback = function(ev)
         if pcall(vim.treesitter.start, ev.buf) then
           vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"

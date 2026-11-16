@@ -2,7 +2,7 @@ return {
   'saghen/blink.cmp',
   -- Stable 1.x releases ship a prebuilt Rust fuzzy matcher (v2 is in development)
   version = '1.*',
-  event = 'InsertEnter',
+  lazy = false, -- blink lazy-loads internally; loading at startup lets it register LSP capabilities before servers start
   ---@module 'blink.cmp'
   ---@type blink.cmp.Config
   opts = {
@@ -14,14 +14,15 @@ return {
       ['<C-l>'] = { 'snippet_forward', 'fallback' },
       ['<C-h>'] = { 'snippet_backward', 'fallback' },
     },
-    -- LSP snippets are expanded with Neovim's built-in vim.snippet (blink's default)
+    -- LSP snippets are expanded with Neovim's built-in vim.snippet (blink's default).
+    -- No 'snippets' source: there are no snippet files (add friendly-snippets to get some).
     signature = { enabled = true },
     sources = {
-      default = { 'lazydev', 'lsp', 'path', 'snippets', 'buffer' },
+      default = { 'lazydev', 'lsp', 'path', 'buffer' },
       per_filetype = {
-        sql = { 'dadbod', 'snippets', 'buffer' },
-        mysql = { 'dadbod', 'snippets', 'buffer' },
-        plsql = { 'dadbod', 'snippets', 'buffer' },
+        sql = { 'dadbod', 'buffer' },
+        mysql = { 'dadbod', 'buffer' },
+        plsql = { 'dadbod', 'buffer' },
       },
       providers = {
         lazydev = { name = 'LazyDev', module = 'lazydev.integrations.blink', score_offset = 100 },

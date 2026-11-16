@@ -1,9 +1,4 @@
--- Run a telescope.builtin picker, loading Telescope on first use
-local function pick(picker, opts)
-  return function()
-    require('telescope.builtin')[picker](type(opts) == 'function' and opts() or opts)
-  end
-end
+local pick = require 'config.pick'
 
 return {
   'nvim-telescope/telescope.nvim',
@@ -66,7 +61,8 @@ return {
     vim.ui.select = lazy_select
   end,
   config = function()
-    require('telescope').setup {
+    local telescope = require 'telescope'
+    telescope.setup {
       extensions = {
         ['ui-select'] = {
           require('telescope.themes').get_dropdown(),
@@ -74,8 +70,8 @@ return {
       },
     }
 
-    -- Enable Telescope extensions if they are installed
-    pcall(require('telescope').load_extension, 'fzf')
-    pcall(require('telescope').load_extension, 'ui-select')
+    -- Extensions are optional (fzf-native needs `make`)
+    pcall(telescope.load_extension, 'fzf')
+    pcall(telescope.load_extension, 'ui-select')
   end,
 }

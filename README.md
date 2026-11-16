@@ -16,9 +16,11 @@ nvim  # lazy.nvim bootstraps itself and installs plugins from lazy-lock.json
 | Path | Purpose |
 |---|---|
 | `init.lua` | Loads core modules, bootstraps lazy.nvim |
-| `lua/options.lua` | Editor options |
-| `lua/keymaps.lua` | Global keymaps |
-| `lua/autocmds.lua` | Autocommands |
+| `lua/config/options.lua` | Editor options |
+| `lua/config/diagnostics.lua` | Diagnostic display and keymaps |
+| `lua/config/keymaps.lua` | Global keymaps |
+| `lua/config/autocmds.lua` | Autocommands |
+| `lua/config/pick.lua` | Lazy Telescope picker helper |
 | `lua/plugins/*.lua` | One lazy.nvim spec per plugin group, auto-imported |
 | `after/lsp/<name>.lua` | Per-server LSP settings, merged over nvim-lspconfig defaults |
 

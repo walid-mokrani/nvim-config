@@ -1,5 +1,87 @@
+local pick = require 'config.pick'
+
+-- Buffer-local LSP keymaps. Neovim's defaults are kept: grn rename, gra code
+-- action, gri implementation, grt type definition, K hover (see :h lsp-defaults).
+local function set_keymaps(bufnr)
+  local function map(keys, func, desc)
+    vim.keymap.set('n', keys, func, { buffer = bufnr, desc = 'LSP: ' .. desc })
+  end
+
+  map('gd', pick 'lsp_definitions', '[G]oto [D]efinition')
+  map('grr', pick 'lsp_references', '[G]oto [R]eferences') -- Telescope instead of the quickfix default
+  map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+  map('<leader>D', pick 'lsp_type_definitions', 'Type [D]efinition')
+  map('<leader>ds', pick 'lsp_document_symbols', '[D]ocument [S]ymbols')
+  map('<leader>ws', pick 'lsp_dynamic_workspace_symbols', '[W]orkspace [S]ymbols')
+  map('<leader>cl', vim.lsp.codelens.run, '[C]ode [L]ens')
+  map('<leader>lr', '<cmd>LspRestart<CR>', '[L]SP [R]estart')
+end
+
+-- Highlight references to the symbol under the cursor. One augroup per buffer,
+-- so a second attaching client doesn't register the autocmds twice.
+local function highlight_group_name(bufnr)
+  return 'user-lsp-highlight-' .. bufnr
+end
+
+local function enable_document_highlight(bufnr)
+  local group = vim.api.nvim_create_augroup(highlight_group_name(bufnr), { clear = true })
+  vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+    buffer = bufnr,
+    group = group,
+    callback = vim.lsp.buf.document_highlight,
+  })
+  vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+    buffer = bufnr,
+    group = group,
+    callback = vim.lsp.buf.clear_references,
+  })
+end
+
+local function on_attach(event)
+  local bufnr = event.buf
+  local client = vim.lsp.get_client_by_id(event.data.client_id)
+  set_keymaps(bufnr)
+  if not client then
+    return
+  end
+
+  if client:supports_method('textDocument/documentHighlight', bufnr) then
+    enable_document_highlight(bufnr)
+  end
+
+  if client:supports_method('textDocument/inlayHint', bufnr) then
+    -- Inferred types and parameter names are most useful in Rust. This lives
+    -- here rather than in after/lsp/rust_analyzer.lua because an on_attach
+    -- there would replace nvim-lspconfig's (which adds :LspCargoReload).
+    if client.name == 'rust_analyzer' then
+      vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+    end
+    vim.keymap.set('n', '<leader>th', function()
+      local filter = { bufnr = bufnr }
+      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(filter), filter)
+    end, { buffer = bufnr, desc = 'LSP: [T]oggle Inlay [H]ints' })
+  end
+end
+
+local function on_detach(event)
+  local bufnr = event.buf
+  local method = 'textDocument/documentHighlight'
+  local client = vim.lsp.get_client_by_id(event.data.client_id)
+  if not (client and client:supports_method(method, bufnr)) then
+    return
+  end
+  -- Keep highlighting if another attached client still provides it
+  for _, other in ipairs(vim.lsp.get_clients { bufnr = bufnr, method = method }) do
+    if other.id ~= client.id then
+      return
+    end
+  end
+  vim.lsp.util.buf_clear_references(bufnr)
+  pcall(vim.api.nvim_del_augroup_by_name, highlight_group_name(bufnr))
+end
+
 return {
-  -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
+  -- Configures lua_ls for the Neovim runtime, this config and plugins
   {
     'folke/lazydev.nvim',
     ft = 'lua',
@@ -10,89 +92,25 @@ return {
     },
   },
 
-  -- Main LSP Configuration
   {
     'neovim/nvim-lspconfig',
     dependencies = {
       { 'mason-org/mason.nvim', opts = {} },
       'WhoIsSethDaniel/mason-tool-installer.nvim',
-      'saghen/blink.cmp',
     },
     config = function()
-      vim.api.nvim_create_autocmd('LspAttach', {
-        group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
-        callback = function(event)
-          local map = function(keys, func, desc, mode)
-            mode = mode or 'n'
-            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
-          end
-          -- Defer requiring Telescope until the key is pressed (keeps it lazy-loaded)
-          local tb = function(picker)
-            return function()
-              require('telescope.builtin')[picker]()
-            end
-          end
+      local group = vim.api.nvim_create_augroup('user-lsp', { clear = true })
+      vim.api.nvim_create_autocmd('LspAttach', { group = group, callback = on_attach })
+      vim.api.nvim_create_autocmd('LspDetach', { group = group, callback = on_detach })
 
-          map('gd', tb 'lsp_definitions', '[G]oto [D]efinition')
-          -- Overrides the built-in grr with the Telescope picker. Other defaults
-          -- (grn rename, gra code action, gri implementation, K hover) are kept.
-          map('grr', tb 'lsp_references', '[G]oto [R]eferences')
-          map('gI', tb 'lsp_implementations', '[G]oto [I]mplementation')
-          map('<leader>D', tb 'lsp_type_definitions', 'Type [D]efinition')
-          map('<leader>ds', tb 'lsp_document_symbols', '[D]ocument [S]ymbols')
-          map('<leader>ws', tb 'lsp_dynamic_workspace_symbols', '[W]orkspace [S]ymbols')
-          map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
-          map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-          map('<leader>cd', vim.diagnostic.open_float, '[C]ode [D]iagnostics')
-          map('<leader>cl', vim.lsp.codelens.run, '[C]ode [L]ens')
-          map('<leader>lr', '<cmd>LspRestart<CR>', '[L]SP [R]estart')
-
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
-            local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
-            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-              buffer = event.buf,
-              group = highlight_augroup,
-              callback = vim.lsp.buf.document_highlight,
-            })
-
-            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-              buffer = event.buf,
-              group = highlight_augroup,
-              callback = vim.lsp.buf.clear_references,
-            })
-
-            vim.api.nvim_create_autocmd('LspDetach', {
-              group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
-              callback = function(event2)
-                vim.lsp.buf.clear_references()
-                vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
-              end,
-            })
-          end
-
-          if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-            -- Inferred types and parameter names are most useful in Rust
-            if client.name == 'rust_analyzer' then
-              vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
-            end
-            map('<leader>th', function()
-              local filter = { bufnr = event.buf }
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(filter), filter)
-            end, '[T]oggle Inlay [H]ints')
-          end
-        end,
-      })
-
-      -- Shared settings for every server. Per-server settings live in
-      -- after/lsp/<name>.lua and are merged over nvim-lspconfig's defaults
-      -- (see :h lsp-config-merge).
-      vim.lsp.config('*', { capabilities = require('blink.cmp').get_lsp_capabilities() })
+      -- Completion capabilities are added by blink.cmp itself (vim.lsp.config('*')).
+      -- Per-server settings live in after/lsp/<name>.lua and are merged over
+      -- nvim-lspconfig's defaults (see :h lsp-config-merge).
 
       -- Language servers to run (nvim-lspconfig names)
       vim.lsp.enable {
         'rust_analyzer', -- from rustup, so it matches the active toolchain
+        'dartls', -- ships with the Dart SDK (fvm)
         'lua_ls',
         'bashls',
         'marksman',

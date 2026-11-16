@@ -4,43 +4,40 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a Neovim configuration based on Kickstart.nvim, modularized for maintainability. It uses lazy.nvim as the plugin manager.
+Personal Neovim config (Neovim 0.12+), originally based on Kickstart.nvim, using lazy.nvim. Format Lua with `stylua .` (config in `.stylua.toml`: 2 spaces, single quotes, no call parentheses).
 
 ## Architecture
 
-**Entry point:** `init.lua` loads core modules and bootstraps lazy.nvim
+- `init.lua` — requires the core modules, then bootstraps lazy.nvim and imports `lua/plugins/`.
+- `lua/config/` — core, plugin-independent setup:
+  - `options.lua` — options, leader (Space), `vim.g.have_nerd_font` (false)
+  - `diagnostics.lua` — `vim.diagnostic.config` and diagnostic keymaps
+  - `keymaps.lua` — global keymaps
+  - `autocmds.lua` — global autocommands
+  - `pick.lua` — helper returning a function that runs a Telescope picker, requiring Telescope only on call (keeps it lazy-loaded)
+- `lua/plugins/*.lua` — each returns a lazy.nvim spec; all are auto-imported. Plugin keymaps live in their spec.
+- `after/lsp/<name>.lua` — per-server LSP settings, merged over nvim-lspconfig's defaults (`:h lsp-config-merge`).
 
-**Core modules in `lua/`:**
-- `options.lua` - Vim options (leader key is Space, relative line numbers enabled)
-- `keymaps.lua` - Key mappings (window navigation, buffer management)
-- `autocmds.lua` - Autocommands (yank highlighting)
+Augroups are named `user-*`.
 
-**Plugin configs in `lua/plugins/`:** Each file returns a lazy.nvim plugin spec. All files in this directory are auto-loaded via `{ import = 'plugins' }`.
+## LSP
 
-## Key Configuration Details
+Native `vim.lsp` with nvim-lspconfig's server configs, set up in `lua/plugins/lsp.lua`: an explicit `vim.lsp.enable { ... }` list and an explicit Mason install list (mason-tool-installer, Mason package names). blink.cmp adds completion capabilities itself. Neovim's default LSP maps (`grn`, `gra`, `gri`, `grt`, `K`) are kept; `gd` and `grr` use Telescope.
 
-- **Leader key:** Space
-- **Nerd Font:** Disabled by default (`vim.g.have_nerd_font = false` in options.lua)
-- **Plugin manager:** lazy.nvim (auto-installed if missing); `lazy-lock.json` is committed, so commit it after `:Lazy update`
-- **LSP:** native `vim.lsp` (Neovim 0.11+) with nvim-lspconfig's defaults. In `lua/plugins/lsp.lua`: shared capabilities via `vim.lsp.config('*')`, servers turned on by an explicit `vim.lsp.enable { ... }` list, and an explicit Mason install list (mason-tool-installer, Mason package names). Per-server settings go in `after/lsp/<name>.lua`, which overrides nvim-lspconfig (see `:h lsp-config-merge`). To add a server: add it to `vim.lsp.enable`, add its Mason package to `ensure_installed` (unless installed another way), and create `after/lsp/<name>.lua` only if it needs custom settings.
-- **Formatting:** conform.nvim with format-on-save (LSP formatting as fallback). Formatters: stylua (Lua), rustfmt (Rust), dart_format (Dart), sql-formatter (SQL), rumdl (Markdown).
-- **Completion:** blink.cmp (1.x) with lazydev, LSP, path, snippets and buffer sources (dadbod for SQL); snippets use Neovim's built-in `vim.snippet`. `<C-y>` accept, `<C-Space>` open, `<C-l>`/`<C-h>` jump in snippet
-- **Database:** vim-dadbod + dadbod-ui with dadbod completion for SQL
+To add a server: add it to `vim.lsp.enable`, add its Mason package to `ensure_installed` (unless installed another way), and create `after/lsp/<name>.lua` only if it needs custom settings. Don't define `on_attach` there if nvim-lspconfig already has one for that server (it would be replaced) — use the shared `LspAttach` handler in `lsp.lua` instead.
 
-## LSP Servers Configured
+Servers: rust_analyzer (from rustup, clippy, inlay hints on), dartls (from the Dart SDK), lua_ls, bashls (with shellcheck), marksman.
 
-rust_analyzer (with clippy, inlay hints on by default; installed via `rustup component add rust-analyzer`, not Mason), bashls (with shellcheck), lua_ls, marksman (Markdown)
+## Other plugins
 
-## Key Bindings Reference
+- **Formatting:** conform.nvim, format-on-save with LSP fallback; formatters listed in `lua/plugins/formatting.lua`.
+- **Completion:** blink.cmp 1.x (lazydev, LSP, path, buffer; dadbod for SQL). `<C-y>` accept, `<C-Space>` open, `<C-l>`/`<C-h>` jump in snippet.
+- **Database:** vim-dadbod + dadbod-ui.
 
-**Search (Telescope, loaded on first use):** `<leader>s` prefix - `sf` files, `sg` grep, `sh` help, `sk` keymaps
-**LSP:** `gd` definition, `grr` references (Telescope), `gI` implementation, `K` hover, `<leader>ca`/`gra` code action, `<leader>rn`/`grn` rename, `]e`/`[e` next/prev error
-**Document:** `<leader>d` prefix - `ds` document symbols
-**Workspace:** `<leader>w` prefix - `ws` workspace symbols
-**Toggle:** `<leader>t` prefix - `tb` git blame, `tD` inline hunk preview, `tg` git line highlights, `tw` word diff, `th` inlay hints
-**Git:** `<leader>h` prefix for hunk operations, `]c`/`[c` navigate changes
-**Format:** `<leader>f` format buffer
+## Keymaps
 
-## Adding New Plugins
+Don't maintain a keymap list here — read the specs, or use `<leader>sk` in Neovim. Leader groups: `c` code, `d` document, `h` git hunk, `l` LSP, `s` search, `t` toggle, `w` workspace.
 
-Create a new file in `lua/plugins/` returning a lazy.nvim plugin spec table. The file will be automatically loaded.
+## Plugin versions
+
+`lazy-lock.json` is committed; commit it after `:Lazy update`.

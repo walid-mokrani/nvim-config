@@ -1,8 +1,8 @@
 return {
   'folke/tokyonight.nvim',
-  priority = 1000, -- Make sure to load this before all the other start plugins.
+  priority = 1000, -- load before other start plugins
   config = function()
+    require('tokyonight').setup { styles = { comments = { italic = false } } }
     vim.cmd.colorscheme 'tokyonight'
-    vim.cmd.hi 'Comment gui=none'
   end,
 }

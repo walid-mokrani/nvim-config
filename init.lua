@@ -1,22 +1,12 @@
---[[
-  Neovim Configuration
-  Based on Kickstart.nvim, modularized for maintainability.
+-- Core settings (leader must be set before lazy.nvim loads plugins)
+require 'config.options'
+require 'config.diagnostics'
+require 'config.keymaps'
+require 'config.autocmds'
 
-  Structure:
-    lua/options.lua    - Vim options and settings
-    lua/keymaps.lua    - Key mappings
-    lua/autocmds.lua   - Autocommands
-    lua/plugins/       - Plugin configurations (one file per plugin/group)
---]]
-
--- Load core configuration
-require 'options'
-require 'keymaps'
-require 'autocmds'
-
--- [[ Install `lazy.nvim` plugin manager ]]
+-- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
   local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
   if vim.v.shell_error ~= 0 then
@@ -25,7 +15,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- [[ Configure and install plugins ]]
 require('lazy').setup({
   { import = 'plugins' },
 }, {
@@ -49,5 +38,3 @@ require('lazy').setup({
     },
   },
 })
-
--- vim: ts=2 sts=2 sw=2 et

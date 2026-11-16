@@ -1,5 +1,6 @@
 return {
   'lewis6991/gitsigns.nvim',
+  event = { 'BufReadPre', 'BufNewFile' },
   opts = {
     signs = {
       add = { text = '+' },
@@ -53,7 +54,7 @@ return {
         gitsigns.diffthis '@'
       end, { desc = 'git [D]iff against last commit' })
       map('n', '<leader>hq', function()
-        gitsigns.setqflist('all')
+        gitsigns.setqflist 'all'
       end, { desc = 'git [q]uickfix all hunks' })
       -- Toggle
       map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line' })
