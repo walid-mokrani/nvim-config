@@ -84,10 +84,10 @@ return {
             ['rust-analyzer'] = {
               cargo = {
                 allFeatures = true,
-                loadOutDirsFromCheck = true,
-                runBuildScripts = true,
+                buildScripts = { enable = true },
               },
-              checkOnSave = {
+              checkOnSave = true,
+              check = {
                 command = 'clippy',
               },
               procMacro = {
@@ -124,14 +124,17 @@ return {
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      -- Native (nvim 0.11+) LSP config: shared capabilities for every server,
+      -- then per-server overrides merged on top of nvim-lspconfig's defaults.
+      vim.lsp.config('*', { capabilities = capabilities })
+      for server_name, server in pairs(servers) do
+        vim.lsp.config(server_name, server)
+      end
+
+      -- mason-lspconfig v2 calls vim.lsp.enable() for installed servers.
       require('mason-lspconfig').setup {
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
+        -- stylua is used as a formatter (conform), not as an LSP
+        automatic_enable = { exclude = { 'stylua' } },
       }
     end,
   },

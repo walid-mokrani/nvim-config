@@ -67,5 +67,7 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
--- Disable stylua LSP (stylua doesn't support --lsp flag, it's just a formatter)
-vim.lsp.config('stylua', { filetypes = {} })
+-- Disable unused remote-plugin providers (Python provider stays enabled via pynvim)
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
