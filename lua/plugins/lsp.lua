@@ -16,7 +16,7 @@ return {
     dependencies = {
       { 'mason-org/mason.nvim', opts = {} },
       'WhoIsSethDaniel/mason-tool-installer.nvim',
-      'hrsh7th/cmp-nvim-lsp',
+      'saghen/blink.cmp',
     },
     config = function()
       vim.api.nvim_create_autocmd('LspAttach', {
@@ -26,15 +26,21 @@ return {
             mode = mode or 'n'
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
+          -- Defer requiring Telescope until the key is pressed (keeps it lazy-loaded)
+          local tb = function(picker)
+            return function()
+              require('telescope.builtin')[picker]()
+            end
+          end
 
-          map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          map('gd', tb 'lsp_definitions', '[G]oto [D]efinition')
           -- Overrides the built-in grr with the Telescope picker. Other defaults
           -- (grn rename, gra code action, gri implementation, K hover) are kept.
-          map('grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-          map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-          map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
-          map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-          map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+          map('grr', tb 'lsp_references', '[G]oto [R]eferences')
+          map('gI', tb 'lsp_implementations', '[G]oto [I]mplementation')
+          map('<leader>D', tb 'lsp_type_definitions', 'Type [D]efinition')
+          map('<leader>ds', tb 'lsp_document_symbols', '[D]ocument [S]ymbols')
+          map('<leader>ws', tb 'lsp_dynamic_workspace_symbols', '[W]orkspace [S]ymbols')
           map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
           map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -82,15 +88,14 @@ return {
       -- Shared settings for every server. Per-server settings live in
       -- after/lsp/<name>.lua and are merged over nvim-lspconfig's defaults
       -- (see :h lsp-config-merge).
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
-      vim.lsp.config('*', { capabilities = capabilities })
+      vim.lsp.config('*', { capabilities = require('blink.cmp').get_lsp_capabilities() })
 
       -- Language servers to run (nvim-lspconfig names)
       vim.lsp.enable {
         'rust_analyzer', -- from rustup, so it matches the active toolchain
         'lua_ls',
         'bashls',
+        'marksman',
       }
 
       -- Tools Mason installs (Mason package names)
@@ -98,8 +103,11 @@ return {
         ensure_installed = {
           'lua-language-server',
           'bash-language-server',
+          'shellcheck', -- linter, used by bash-language-server
+          'marksman',
           'stylua', -- formatter (conform)
           'sql-formatter', -- formatter (conform)
+          'rumdl', -- Markdown formatter (conform)
         },
       }
     end,

@@ -23,17 +23,17 @@ This is a Neovim configuration based on Kickstart.nvim, modularized for maintain
 - **Nerd Font:** Disabled by default (`vim.g.have_nerd_font = false` in options.lua)
 - **Plugin manager:** lazy.nvim (auto-installed if missing); `lazy-lock.json` is committed, so commit it after `:Lazy update`
 - **LSP:** native `vim.lsp` (Neovim 0.11+) with nvim-lspconfig's defaults. In `lua/plugins/lsp.lua`: shared capabilities via `vim.lsp.config('*')`, servers turned on by an explicit `vim.lsp.enable { ... }` list, and an explicit Mason install list (mason-tool-installer, Mason package names). Per-server settings go in `after/lsp/<name>.lua`, which overrides nvim-lspconfig (see `:h lsp-config-merge`). To add a server: add it to `vim.lsp.enable`, add its Mason package to `ensure_installed` (unless installed another way), and create `after/lsp/<name>.lua` only if it needs custom settings.
-- **Formatting:** conform.nvim with format-on-save (LSP formatting as fallback). Formatters: stylua (Lua), rustfmt (Rust), dart_format (Dart), sql-formatter (SQL).
-- **Completion:** nvim-cmp with LSP source
+- **Formatting:** conform.nvim with format-on-save (LSP formatting as fallback). Formatters: stylua (Lua), rustfmt (Rust), dart_format (Dart), sql-formatter (SQL), rumdl (Markdown).
+- **Completion:** blink.cmp (1.x) with lazydev, LSP, path, snippets and buffer sources (dadbod for SQL); snippets use Neovim's built-in `vim.snippet`. `<C-y>` accept, `<C-Space>` open, `<C-l>`/`<C-h>` jump in snippet
 - **Database:** vim-dadbod + dadbod-ui with dadbod completion for SQL
 
 ## LSP Servers Configured
 
-rust_analyzer (with clippy, inlay hints on by default; installed via `rustup component add rust-analyzer`, not Mason), bashls, lua_ls
+rust_analyzer (with clippy, inlay hints on by default; installed via `rustup component add rust-analyzer`, not Mason), bashls (with shellcheck), lua_ls, marksman (Markdown)
 
 ## Key Bindings Reference
 
-**Search (Telescope):** `<leader>s` prefix - `sf` files, `sg` grep, `sh` help, `sk` keymaps
+**Search (Telescope, loaded on first use):** `<leader>s` prefix - `sf` files, `sg` grep, `sh` help, `sk` keymaps
 **LSP:** `gd` definition, `grr` references (Telescope), `gI` implementation, `K` hover, `<leader>ca`/`gra` code action, `<leader>rn`/`grn` rename, `]e`/`[e` next/prev error
 **Document:** `<leader>d` prefix - `ds` document symbols
 **Workspace:** `<leader>w` prefix - `ws` workspace symbols

@@ -23,6 +23,7 @@ return {
       rust = { 'rustfmt' },
       dart = { 'dart_format' },
       sql = { 'sql_formatter' },
+      markdown = { 'rumdl' },
     },
   },
 }
