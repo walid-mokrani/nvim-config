@@ -21,9 +21,9 @@ This is a Neovim configuration based on Kickstart.nvim, modularized for maintain
 
 - **Leader key:** Space
 - **Nerd Font:** Disabled by default (`vim.g.have_nerd_font = false` in options.lua)
-- **Plugin manager:** lazy.nvim (auto-installed if missing)
+- **Plugin manager:** lazy.nvim (auto-installed if missing); `lazy-lock.json` is committed, so commit it after `:Lazy update`
 - **LSP:** nvim-lspconfig with Mason for automatic installation
-- **Formatting:** conform.nvim with format-on-save (LSP fallback disabled for C/C++). Formatters: stylua (Lua), rustfmt (Rust), dart_format (Dart), sql-formatter (SQL).
+- **Formatting:** conform.nvim with format-on-save (LSP formatting as fallback). Formatters: stylua (Lua), rustfmt (Rust), dart_format (Dart), sql-formatter (SQL).
 - **Completion:** nvim-cmp with LSP source
 - **Database:** vim-dadbod + dadbod-ui with dadbod completion for SQL
 
@@ -34,10 +34,10 @@ rust_analyzer (with clippy), bashls, lua_ls
 ## Key Bindings Reference
 
 **Search (Telescope):** `<leader>s` prefix - `sf` files, `sg` grep, `sh` help, `sk` keymaps
-**LSP:** `gd` definition, `gr` references, `K` hover, `<leader>ca` code action, `<leader>rn` rename
-**Document/Debug:** `<leader>d` prefix - `ds` document symbols, `db` breakpoint, `dc` continue
+**LSP:** `gd` definition, `grr` references (Telescope), `gI` implementation, `K` hover, `<leader>ca`/`gra` code action, `<leader>rn`/`grn` rename, `]e`/`[e` next/prev error
+**Document:** `<leader>d` prefix - `ds` document symbols
 **Workspace:** `<leader>w` prefix - `ws` workspace symbols
-**Toggle:** `<leader>t` prefix - `tb` git blame, `tD` git deleted, `th` inlay hints
+**Toggle:** `<leader>t` prefix - `tb` git blame, `tD` inline hunk preview, `tg` git line highlights, `tw` word diff, `th` inlay hints
 **Git:** `<leader>h` prefix for hunk operations, `]c`/`[c` navigate changes
 **Format:** `<leader>f` format buffer
 

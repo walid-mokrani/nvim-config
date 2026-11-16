@@ -50,7 +50,7 @@ return {
         { name = 'nvim_lsp' },
         { name = 'luasnip' },
         { name = 'path' },
-        { name = 'dadbod', ft = { 'sql', 'mysql', 'plsql' } },
+        { name = 'vim-dadbod-completion' },
       },
     }
   end,

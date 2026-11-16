@@ -14,8 +14,8 @@ return {
   {
     'neovim/nvim-lspconfig',
     dependencies = {
-      { 'williamboman/mason.nvim', opts = {} },
-      'williamboman/mason-lspconfig.nvim',
+      { 'mason-org/mason.nvim', opts = {} },
+      'mason-org/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
       'hrsh7th/cmp-nvim-lsp',
     },
@@ -29,7 +29,9 @@ return {
           end
 
           map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-          map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+          -- Overrides the built-in grr with the Telescope picker. Other defaults
+          -- (grn rename, gra code action, gri implementation, K hover) are kept.
+          map('grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
           map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
           map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
           map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
@@ -37,7 +39,6 @@ return {
           map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
           map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-          map('K', vim.lsp.buf.hover, 'Hover Documentation')
           map('<leader>cd', vim.diagnostic.open_float, '[C]ode [D]iagnostics')
           map('<leader>cl', vim.lsp.codelens.run, '[C]ode [L]ens')
           map('<leader>lr', '<cmd>LspRestart<CR>', '[L]SP [R]estart')
