@@ -1,15 +1,4 @@
 return {
-  -- Detect tabstop and shiftwidth automatically
-  'tpope/vim-sleuth',
-
-  -- Highlight todo, notes, etc in comments
-  {
-    'folke/todo-comments.nvim',
-    event = 'VimEnter',
-    dependencies = { 'nvim-lua/plenary.nvim' },
-    opts = { signs = false },
-  },
-
   -- Useful plugin to show you pending keybinds
   {
     'folke/which-key.nvim',
@@ -56,23 +45,14 @@ return {
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
-        { '<leader>F', group = '[F]lutter' },
-        { '<leader>A', group = '[A]I Claude' },
       },
     },
   },
 
-  -- Collection of various small independent plugins/modules
+  -- Statusline (from mini.nvim)
   {
     'echasnovski/mini.nvim',
     config = function()
-      -- Better Around/Inside textobjects
-      require('mini.ai').setup { n_lines = 500 }
-
-      -- Add/delete/replace surroundings (brackets, quotes, etc.)
-      require('mini.surround').setup()
-
-      -- Simple and easy statusline
       local statusline = require 'mini.statusline'
       statusline.setup { use_icons = vim.g.have_nerd_font }
 

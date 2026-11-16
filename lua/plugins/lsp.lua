@@ -17,7 +17,6 @@ return {
       { 'williamboman/mason.nvim', opts = {} },
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
-      { 'j-hui/fidget.nvim', opts = {} },
       'hrsh7th/cmp-nvim-lsp',
     },
     config = function()
@@ -97,14 +96,6 @@ return {
           },
         },
         bashls = {},
-        cssls = {},
-        html = {},
-        jsonls = {},
-        yamlls = {},
-        ts_ls = {},
-        -- Biome: lint diagnostics + code actions; only attaches when a
-        -- biome.json/biome.jsonc is present, reading the project's own rules.
-        biome = {},
         lua_ls = {
           settings = {
             Lua = {
@@ -119,7 +110,6 @@ return {
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua',
-        'prettierd',
         'sql-formatter',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
